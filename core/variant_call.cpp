@@ -586,6 +586,7 @@ struct _VariantCall {
 	VCALL_LOCALMEM0(Callable, get_object_id);
 	VCALL_LOCALMEM0(Callable, get_method);
 	VCALL_LOCALMEM0(Callable, hash);
+	VCALL_LOCALMEM1R(Callable, unbind);
 
 	VCALL_LOCALMEM0R(Signal, is_null);
 	VCALL_LOCALMEM0R(Signal, get_object);
@@ -1035,7 +1036,7 @@ struct _VariantCall {
 	VCALL_PTR0R(Basis, get_orthogonal_index);
 	VCALL_PTR0R(Basis, orthonormalized);
 	VCALL_PTR2R(Basis, slerp);
-	VCALL_PTR2R(Basis, is_equal_approx); // TODO: Break compatibility in 4.0 to change this to an instance method (a.is_equal_approx(b) as VCALL_PTR1R) for consistency.
+	VCALL_PTR1R(Basis, is_equal_approx);
 	VCALL_PTR0R(Basis, get_rotation_quat);
 
 	VCALL_PTR0R(Transform, inverse);
@@ -1347,11 +1348,14 @@ void Variant::call_ptr(const StringName &p_method, const Variant **p_args, int p
 				if (p_method == CoreStringNames::get_singleton()->call) {
 					reinterpret_cast<const Callable *>(_data._mem)->call(p_args, p_argcount, ret, r_error);
 					valid = true;
-				}
-				if (p_method == CoreStringNames::get_singleton()->call_deferred) {
+				} else if (p_method == CoreStringNames::get_singleton()->call_deferred) {
 					reinterpret_cast<const Callable *>(_data._mem)->call_deferred(p_args, p_argcount);
 					valid = true;
+				} else if (p_method == CoreStringNames::get_singleton()->bind) {
+					ret = reinterpret_cast<const Callable *>(_data._mem)->bind(p_args, p_argcount);
+					valid = true;
 				}
+
 			} else if (type == SIGNAL) {
 				if (p_method == CoreStringNames::get_singleton()->emit) {
 					if (r_ret) {
@@ -1696,9 +1700,13 @@ void Variant::get_method_list(List<MethodInfo> *p_list) const {
 
 	if (type == CALLABLE) {
 		MethodInfo mi;
+
+		mi.name = "bind";
+		mi.flags |= METHOD_FLAG_VARARG;
+		p_list->push_back(mi);
+
 		mi.name = "call";
 		mi.return_val.usage = PROPERTY_USAGE_NIL_IS_VARIANT;
-		mi.flags |= METHOD_FLAG_VARARG;
 
 		p_list->push_back(mi);
 
@@ -2130,6 +2138,7 @@ void register_variant_methods() {
 	ADDFUNC0R(CALLABLE, INT, Callable, get_object_id, varray());
 	ADDFUNC0R(CALLABLE, STRING_NAME, Callable, get_method, varray());
 	ADDFUNC0R(CALLABLE, INT, Callable, hash, varray());
+	ADDFUNC1R(CALLABLE, CALLABLE, Callable, unbind, INT, "argcount", varray());
 
 	ADDFUNC0R(SIGNAL, BOOL, Signal, is_null, varray());
 	ADDFUNC0R(SIGNAL, OBJECT, Signal, get_object, varray());
@@ -2356,7 +2365,7 @@ void register_variant_methods() {
 	ADDFUNC1R(BASIS, VECTOR3, Basis, xform_inv, VECTOR3, "v", varray());
 	ADDFUNC0R(BASIS, INT, Basis, get_orthogonal_index, varray());
 	ADDFUNC2R(BASIS, BASIS, Basis, slerp, BASIS, "b", FLOAT, "t", varray());
-	ADDFUNC2R(BASIS, BOOL, Basis, is_equal_approx, BASIS, "b", FLOAT, "epsilon", varray(CMP_EPSILON)); // TODO: Replace in 4.0, see other TODO.
+	ADDFUNC1R(BASIS, BOOL, Basis, is_equal_approx, BASIS, "b", varray());
 	ADDFUNC0R(BASIS, QUAT, Basis, get_rotation_quat, varray());
 
 	ADDFUNC0R(TRANSFORM, TRANSFORM, Transform, inverse, varray());

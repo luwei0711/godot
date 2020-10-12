@@ -9,6 +9,9 @@
 		[b]Overriding:[/b] Any project setting can be overridden by creating a file named [code]override.cfg[/code] in the project's root directory. This can also be used in exported projects by placing this file in the same directory as the project binary.
 	</description>
 	<tutorials>
+		<link title="3D Physics Tests Demo">https://godotengine.org/asset-library/asset/675</link>
+		<link title="3D Platformer Demo">https://godotengine.org/asset-library/asset/125</link>
+		<link title="OS Test Demo">https://godotengine.org/asset-library/asset/677</link>
 	</tutorials>
 	<methods>
 		<method name="add_property_info">
@@ -555,6 +558,9 @@
 		<member name="input_devices/pointing/emulate_touch_from_mouse" type="bool" setter="" getter="" default="false">
 			If [code]true[/code], sends touch input events when clicking or dragging the mouse.
 		</member>
+		<member name="input_devices/pointing/ios/touch_delay" type="float" setter="" getter="" default="0.15">
+			Default delay for touch events. This only affects iOS devices.
+		</member>
 		<member name="layer_names/2d_physics/layer_1" type="String" setter="" getter="" default="&quot;&quot;">
 			Optional name for the 2D physics layer 1.
 		</member>
@@ -812,7 +818,7 @@
 		<member name="logging/file_logging/max_log_files" type="int" setter="" getter="" default="5">
 			Specifies the maximum amount of log files allowed (used for rotation).
 		</member>
-		<member name="memory/limits/message_queue/max_size_kb" type="int" setter="" getter="" default="1024">
+		<member name="memory/limits/message_queue/max_size_kb" type="int" setter="" getter="" default="4096">
 			Godot uses a message queue to defer some function calls. If you run out of space on it (you will see an error), you can increase the size here.
 		</member>
 		<member name="memory/limits/multithreaded_server/rid_pool_prealloc" type="int" setter="" getter="" default="60">

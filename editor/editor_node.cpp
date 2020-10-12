@@ -128,6 +128,7 @@
 #include "editor/plugins/gi_probe_editor_plugin.h"
 #include "editor/plugins/gpu_particles_2d_editor_plugin.h"
 #include "editor/plugins/gpu_particles_3d_editor_plugin.h"
+#include "editor/plugins/gpu_particles_collision_sdf_editor_plugin.h"
 #include "editor/plugins/gradient_editor_plugin.h"
 #include "editor/plugins/item_list_editor_plugin.h"
 #include "editor/plugins/light_occluder_2d_editor_plugin.h"
@@ -2545,6 +2546,8 @@ void EditorNode::_menu_option_confirm(int p_option, bool p_confirmed) {
 			}
 		} break;
 		case RUN_PROJECT_DATA_FOLDER: {
+			// ensure_user_data_dir() to prevent the edge case: "Open Project Data Folder" won't work after the project was renamed in ProjectSettingsEditor unless the project is saved
+			OS::get_singleton()->ensure_user_data_dir();
 			OS::get_singleton()->shell_open(String("file://") + OS::get_singleton()->get_user_data_dir());
 		} break;
 		case FILE_EXPLORE_ANDROID_BUILD_TEMPLATES: {
@@ -6633,6 +6636,7 @@ EditorNode::EditorNode() {
 	add_editor_plugin(memnew(PhysicalBone3DEditorPlugin(this)));
 	add_editor_plugin(memnew(MeshEditorPlugin(this)));
 	add_editor_plugin(memnew(MaterialEditorPlugin(this)));
+	add_editor_plugin(memnew(GPUParticlesCollisionSDFEditorPlugin(this)));
 
 	for (int i = 0; i < EditorPlugins::get_plugin_count(); i++) {
 		add_editor_plugin(EditorPlugins::create(i, this));
